@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { Button, Col, Table } from 'react-bootstrap';
+import _ from 'lodash'
 
 const data = [
   { name: 'Veggie Burger', menuCategory: 'Burgers', salesCategory: 'Food', menuPage: 'Dinner', salesRevenue: 40, quantitySold: 4 },
@@ -28,17 +29,33 @@ class App extends Component {
   constructor(props){
     super(props);
 
-    // this.state = {
-    //   data: this.props.data,
-     
-    // }
+    this.state = {
+      data: data,
+      //names:  Object.values(data).map( item => item.name )
+ 
+    }
       //bind functions here
-      //this.handleSelectChange=this.handleSelectChange.bind(this);
+      this.sortItem=this.sortItem.bind(this);
     
     }
 
     //functions go here
+sortItem = (e) => {
+    e.preventDefault();
+//make a copy of data object
+    let __data = Object.assign({}, this.state.data);
+//use lodash to sort
+   let sorted =  _.sortBy(__data, o => o.name);
 
+
+debugger; 
+
+    this.setState({
+        data: sorted
+        
+    })
+  
+}
 
   render(props) {
 //use this to get header names dynamically
@@ -46,7 +63,11 @@ class App extends Component {
 
 //what if there are 2 map functions, the 1st iterates over item; the 2nd iterates over each item and 
 //dumps object.values or whatever for each category
-const dataProducts = data.map((item) => {
+//sortable categories will be managed by state
+
+
+
+const dataProducts = this.state.data.map((item) => {
     return (<tr key={item.index}>
               <td>{item.name}</td>
               <td>{item.menuCategory}</td>
@@ -56,8 +77,8 @@ const dataProducts = data.map((item) => {
               <td>{item.quantitySold}</td>
           </tr>)
 });
-//create JSX elements & use .reduce to sum values for sales and quantity
-const SumSalesRevenue = () => {
+//create JSX elements & use .reduce to sum values for sales and quantity. Could we/should we move these to a class?
+const SumSalesRevenue = () => { 
     let sum = data.reduce((prevVal, item) => prevVal + item.salesRevenue, 0)
     return (<td>{sum}</td>)
 };
@@ -73,7 +94,7 @@ const SumQuantitySold = () => {
         <Table bsStyle="table table-striped">
         <thead>
             <tr>
-            <a className="sort"><th scope="col">Name</th></a>
+            <NameHeader sortItem={this.sortItem}/>    
             <th scope="col">Menu Category</th>
             <th scope="col">Sales Category</th>
             <th scope="col">Menu Pages</th>
@@ -90,24 +111,34 @@ const SumQuantitySold = () => {
 
                 <SumSalesRevenue />
                 <SumQuantitySold />
-              
-
+    
             </tr>
         </tfoot>            
         <tbody>
-            { dataProducts }
+             { dataProducts } 
             
         </tbody>
         </Table>
+      </div>
+)}}
+
+class NameHeader extends Component {
+   render() {
+      return (
+            <th className="sortName" onClick={(e)=>this.props.sortItem(e)} scope="col">
+                <a>Name</a>
+            </th>    
+      )}
+}
+
+// class DataProducts extends Component {
+//     render() { 
 
         
 
-
-
-
-      </div>
-    );
-  }
-}
-
+//         return (
+//         )
+        
+//     }
+// }
 export default App;
