@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Button, Col, Table } from 'react-bootstrap';
+import { Row, Col, Table } from 'react-bootstrap';
 import _ from 'lodash'
 
 const data = [
@@ -31,41 +31,35 @@ class App extends Component {
 
     this.state = {
       data: data,
-      //names:  Object.values(data).map( item => item.name )
  
     }
       //bind functions here
       this.sortItem=this.sortItem.bind(this);
-    
     }
 
-    //functions go here
-sortItem = (e) => {
-    e.preventDefault();
+sortItem = (value) => {
+
+    debugger; 
 //make a copy of data object
     let __data = Object.assign({}, this.state.data);
 //use lodash to sort
-   let sorted =  _.sortBy(__data, o => o.name);
-
-
-debugger; 
+   //let sorted =  _.sortBy(__data, o => o.name);
+   let sorted =  _.sortBy(__data, o => o[value]);
 
     this.setState({
         data: sorted
-        
     })
-  
 }
 
-  render(props) {
+
+
+render() {
 //use this to get header names dynamically
-//const headers = Object.keys(data[0]);
+let headerNames = Object.keys(...data); 
 
-//what if there are 2 map functions, the 1st iterates over item; the 2nd iterates over each item and 
-//dumps object.values or whatever for each category
-//sortable categories will be managed by state
-
-
+const headers = headerNames.map((item, index) => {
+    return (<Header key={index} item={item} sortItem={this.sortItem}/>)
+})
 
 const dataProducts = this.state.data.map((item) => {
     return (<tr key={item.index}>
@@ -77,7 +71,40 @@ const dataProducts = this.state.data.map((item) => {
               <td>{item.quantitySold}</td>
           </tr>)
 });
-//create JSX elements & use .reduce to sum values for sales and quantity. Could we/should we move these to a class?
+
+
+    return (
+      <div>
+        <Row>
+			<Col md={8}>  
+        <h1>TouchBistro React Challenge</h1>
+        <h2>Click each heading to (toggle) sort</h2>
+        <Table bsStyle="table table-striped">
+        <thead>
+            <tr>
+            { headers }
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td className="subtotal">Sum</td>
+                <SumSalesRevenue /> 
+                <SumQuantitySold /> 
+            </tr>
+        </tfoot>            
+        <tbody>
+             { dataProducts }
+            
+        </tbody>
+        </Table>
+        </Col>
+        </Row>
+      </div>
+)}}
+
 const SumSalesRevenue = () => { 
     let sum = data.reduce((prevVal, item) => prevVal + item.salesRevenue, 0)
     return (<td>{sum}</td>)
@@ -88,57 +115,11 @@ const SumQuantitySold = () => {
     return (<td>{sum}</td>)
 };
 
+const Header = (props) => {
     return (
-      <div>
-        <h1>React Challenge</h1>
-        <Table bsStyle="table table-striped">
-        <thead>
-            <tr>
-            <NameHeader sortItem={this.sortItem}/>    
-            <th scope="col">Menu Category</th>
-            <th scope="col">Sales Category</th>
-            <th scope="col">Menu Pages</th>
-            <th scope="col">Sales Revenue</th>
-            <th scope="col">Quantity Sold</th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td className="subtotal">Sum</td>
+        <th className="" onClick={()=> props.sortItem(props.item)} scope="col">
+            <a><h3>{props.item}</h3></a>
+        </th>    
+  )}
 
-                <SumSalesRevenue />
-                <SumQuantitySold />
-    
-            </tr>
-        </tfoot>            
-        <tbody>
-             { dataProducts } 
-            
-        </tbody>
-        </Table>
-      </div>
-)}}
-
-class NameHeader extends Component {
-   render() {
-      return (
-            <th className="sortName" onClick={(e)=>this.props.sortItem(e)} scope="col">
-                <a>Name</a>
-            </th>    
-      )}
-}
-
-// class DataProducts extends Component {
-//     render() { 
-
-        
-
-//         return (
-//         )
-        
-//     }
-// }
 export default App;

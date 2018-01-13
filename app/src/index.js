@@ -6,8 +6,6 @@ import registerServiceWorker from './registerServiceWorker';
 import bootstrap from 'bootstrap/dist/css/bootstrap.css';
 
 
-
-
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();
 
