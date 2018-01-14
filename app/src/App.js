@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Row, Col, Table } from 'react-bootstrap';
 import _ from 'lodash'
@@ -29,21 +28,15 @@ class App extends Component {
   constructor(props){
     super(props);
 
-    this.state = {
-      data: data,
- 
-    }
-      //bind functions here
-      this.sortItem=this.sortItem.bind(this);
+        this.state = {
+        data: data
+        }
     }
 
 sortItem = (value) => {
-
-    debugger; 
 //make a copy of data object
-    let __data = Object.assign({}, this.state.data);
-//use lodash to sort
-   //let sorted =  _.sortBy(__data, o => o.name);
+    let __data = Object.assign({}, this.state.data)
+    //use lodash to sort
    let sorted =  _.sortBy(__data, o => o[value]);
 
     this.setState({
@@ -51,18 +44,46 @@ sortItem = (value) => {
     })
 }
 
+sortNames = (e) => {
+    let data = this.state.data 
 
+    let letter = (e.target.value).toLowerCase() 
+    if (!letter){
+        this.setState({
+            data: this.props.data
+        })
+    }
+    debugger; 
 
-render() {
+    
+
+    let filtered = _.filter(data, function(o) { 
+        return o.name[0].toLowerCase() === letter  
+    });
+
+    this.setState({
+        data: filtered
+    })
+
+}
+
+render(props) {
 //use this to get header names dynamically
-let headerNames = Object.keys(...data); 
+//this is not good... needs to move into own component b/c headers re-render every time sort function called
+
+
+let data = this.props.data
+debugger; 
+let headerNames = Object.values(data); 
+debugger; 
 
 const headers = headerNames.map((item, index) => {
-    return (<Header key={index} item={item} sortItem={this.sortItem}/>)
+    let formattedHeading = _.startCase(item)
+    return (<Header key={index} item={item} name={formattedHeading} sortItem={this.sortItem}/>)
 })
 
-const dataProducts = this.state.data.map((item) => {
-    return (<tr key={item.index}>
+const dataProducts = data.map((item, index) => {
+    return (<tr key={index}>
               <td>{item.name}</td>
               <td>{item.menuCategory}</td>
               <td>{item.salesCategory}</td>
@@ -76,31 +97,31 @@ const dataProducts = this.state.data.map((item) => {
     return (
       <div>
         <Row>
-			<Col md={8}>  
-        <h1>TouchBistro React Challenge</h1>
-        <h2>Click each heading to (toggle) sort</h2>
-        <Table bsStyle="table table-striped">
-        <thead>
-            <tr>
-            { headers }
-            </tr>
-        </thead>
-        <tfoot>
-            <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td className="subtotal">Sum</td>
-                <SumSalesRevenue /> 
-                <SumQuantitySold /> 
-            </tr>
-        </tfoot>            
-        <tbody>
-             { dataProducts }
-            
-        </tbody>
-        </Table>
-        </Col>
+			<Col xs={10} xsOffset={1}>  
+                <h1>TouchBistro React Challenge</h1>
+                <h2>Click each heading to sort</h2>
+                <Form sortNames={this.sortNames}/>
+                <Table bsStyle="table table-striped">
+                    <thead>
+                        <tr>
+                        { headers }
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td className="subtotal">Sum</td>
+                            <SumSalesRevenue /> 
+                            <SumQuantitySold /> 
+                        </tr>
+                    </tfoot>            
+                    <tbody>
+                        { dataProducts }
+                    </tbody>
+                </Table>
+            </Col>
         </Row>
       </div>
 )}}
@@ -115,11 +136,19 @@ const SumQuantitySold = () => {
     return (<td>{sum}</td>)
 };
 
+//use stateless functional components
 const Header = (props) => {
     return (
         <th className="" onClick={()=> props.sortItem(props.item)} scope="col">
-            <a><h3>{props.item}</h3></a>
+            <a><h3>{props.name}</h3></a>
         </th>    
   )}
 
+const Form = (props) => {
+    return (
+        <form>
+            <input onChange={(e) => props.sortNames(e)} type="" className="form-control" placeholder="type something"></input>
+        </form>
+        )
+}
 export default App;
