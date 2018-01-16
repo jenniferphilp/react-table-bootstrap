@@ -3,7 +3,6 @@ import './App.css';
 import { Row, Col, Table } from 'react-bootstrap';
 import _ from 'lodash';
 
-
 const data = [
   { name: 'Veggie Burger', menuCategory: 'Burgers', salesCategory: 'Food', menuPage: 'Dinner', salesRevenue: 40, quantitySold: 4 },
   { name: 'Spicy Burger', menuCategory: 'Burgers', salesCategory: 'Food', menuPage: 'Dinner', salesRevenue: 20, quantitySold: 2 },
@@ -25,18 +24,20 @@ const data = [
   { name: 'Bacon Burger', menuCategory: 'Burgers', salesCategory: 'Food', menuPage: 'Dinner', salesRevenue: 60, quantitySold: 6 },
 ]
 
-class App extends React.Component {
+class App extends Component {
   constructor(props){
     super(props);
 
         this.state = {
         data: data
         }
+      
 
         this.sortItem = this.sortItem.bind(this);
 
     }
 
+//make sort toggle-able (i.e. A-Z then Z-A) using an attribute on HeaderItem; manage it by state (ie. sorted = true) 
 sortItem = (value) => {
     //make a copy of data object
     let data = this.state.data; 
@@ -47,13 +48,6 @@ sortItem = (value) => {
 
     this.setState({
         data: sorted
-    })
-}
-
-handleChange = (e) => {
-    debugger; 
-    this.setState({
-        text: e.target.value
     })
 }
 
@@ -68,27 +62,23 @@ render() {
                 <td>{item.salesRevenue}</td>
                 <td>{item.quantitySold}</td>
             </tr>)
-    });
+        });
 
     return (
       <div>
         <Row>
-			<Col xs={10} xsOffset={1}>  
+			<Col sm={8} smOffset={2} xs={11} xsOffset={1}>  
                 <h1>TouchBistro React Challenge</h1>
-                <h2>Click each heading to sort</h2>
+                <h3>Click each heading to sort</h3>
                 <Table bsStyle="table table-striped">
       
                     <Header 
                         sortItem = {this.sortItem}
-                        
                     />
 
                     <tfoot>
                         <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td className="subtotal">Sum</td>
+                            <td colSpan="4" className="subtotal sum sumTitle">Sum</td>
                             <SumSalesRevenue /> 
                             <SumQuantitySold /> 
                         </tr>
@@ -102,16 +92,18 @@ render() {
       </div>
 )}}
 
+//keep these stateless for now, unless we do the filter feature
 const SumSalesRevenue = () => { 
     let sum = data.reduce((prevVal, item) => prevVal + item.salesRevenue, 0)
-    return (<td>{sum}</td>)
+    return (<td className="sum">{sum}</td>)
 };
  
 const SumQuantitySold = () => {
     let sum = data.reduce((prevVal, item) => prevVal + item.quantitySold, 0)
-    return (<td>{sum}</td>)
+    return (<td className="sum">{sum}</td>)
 };
 
+//should this be a class? Does it need to be? 
 const Header = (props) => {
     let headerNames = Object.keys(...data);
         return (
@@ -129,11 +121,10 @@ const Header = (props) => {
     
 }
 
-
 const HeaderItem = (props) => {
     return (
-        <th className="" onClick={ () => props.sortItem(props.item) }>
-            <a><h3>{props.name}</h3></a>
+        <th className="" onClick={ () => props.sortItem(props.item)}>
+            <a><h4>{props.name}</h4></a>
         </th>   
   )
 }
