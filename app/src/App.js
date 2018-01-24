@@ -29,7 +29,8 @@ class App extends Component {
     super(props);
 
         this.state = {
-        data: data
+        data: data,
+        isSorted: [false, false, false, false, false, false]
         }
       
 
@@ -38,17 +39,27 @@ class App extends Component {
     }
 
 //make sort toggle-able (i.e. A-Z then Z-A) using an attribute on HeaderItem; manage it by state (ie. sorted = true) 
-sortItem = (value) => {
-    //make a copy of data object
-    let data = this.state.data; 
+sortItem = (value, index) => {
+    //is isSorted true or false?
+    let isSortedItem = this.state.isSorted[index];
+
+    //make some copies...
+    let isSortedCopy = [...this.state.isSorted];
+    let data = this.state.data;
     let copy = Object.assign({}, data);
+    
+    //use lodash to sort, based on value of isSortedItem (boolean)
+    let sorted; 
+    isSortedItem ? sorted =  _.orderBy(copy, [value], ['desc']) : sorted = _.sortBy(copy, o => o[value]);
 
-    //use lodash to sort
-   let sorted =  _.sortBy(copy, o => o[value]);
+    //change the boolean value of isSorted, at the appropriate index
+    isSortedCopy[index] = !isSortedItem;
 
-    this.setState({
-        data: sorted
+   this.setState({
+        data: sorted,
+        isSorted: isSortedCopy
     })
+
 }
 
 render() {
@@ -64,6 +75,7 @@ render() {
             </tr>)
         });
 
+
     return (
       <div>
         <Row>
@@ -74,6 +86,7 @@ render() {
       
                     <Header 
                         sortItem = {this.sortItem}
+                        sorted = {this.state.sorted}
                     />
 
                     <tfoot>
@@ -92,7 +105,7 @@ render() {
       </div>
 )}}
 
-//keep these stateless for now, unless we do the filter feature
+//keep these stateless for now, unless we do the filter feature. 
 const SumSalesRevenue = () => { 
     let sum = data.reduce((prevVal, item) => prevVal + item.salesRevenue, 0)
     return (<td className="sum">{sum}</td>)
@@ -112,21 +125,28 @@ const Header = (props) => {
 
                 {headerNames.map((item, index) => {
                 let formattedHeading = _.startCase(item)
+            
                 return(
-                <HeaderItem key={index} item={item} name={formattedHeading} sortItem={props.sortItem} />)
-                })}
                     
+                <HeaderItem key={index} index={index} item={item} name={formattedHeading} sortItem={props.sortItem} isSorted={props.sorted}/>)
+                })}
+                
                 </tr>
+                
             </thead> )   
+ 
+            
     
 }
 
 const HeaderItem = (props) => {
+
     return (
-        <th className="" onClick={ () => props.sortItem(props.item)}>
+        <th onClick={ () => props.sortItem(props.item, props.index)}>
             <a><h4>{props.name}</h4></a>
         </th>   
   )
+
 }
 
 export default App;
