@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Row, Col, Table } from 'react-bootstrap';
+import { Row, Col, Table, Button } from 'react-bootstrap';
 import _ from 'lodash';
 import { data } from './data.js';
 
@@ -10,14 +10,14 @@ class App extends Component {
   constructor(props){
     super(props);
 
-        this.state = {
-            
-        data: data,
-        isSorted: [false, false, false, false, false, false]
-        }
-      
-        this.sortItem = this.sortItem.bind(this);
+        this.state = {     
+            data: data,
+            isSorted: [false, false, false, false, false, false],
+            value: ""}
 
+        this.sortItem = this.sortItem.bind(this);
+        this.handleFilter = this.handleFilter.bind(this);
+        this.handleReset = this.handleReset.bind(this);
     }
 
 //make sort toggle-able (i.e. A-Z then Z-A) using an attribute on HeaderItem; manage it by state (ie. sorted = true) 
@@ -44,6 +44,29 @@ sortItem = (value, index) => {
 
 }
 
+handleFilter(event) {
+    event.preventDefault();
+    let filter = event.target.value.toLowerCase();
+    let dataCopy = Object.assign({}, data);
+    let filteredDataCopy = _.filter(dataCopy, function(o) {
+        if (o.name[0].toLowerCase() === filter){
+            return o;
+        } 
+    })
+    this.setState({
+        value: filter,
+        data: filteredDataCopy
+    }); 
+  }
+
+  handleReset(e){
+    e.preventDefault();
+    this.setState({
+        data: data
+    })
+  }
+
+
 render() {
 
     const dataProducts = (this.state.data).map((item, id) => {
@@ -62,8 +85,13 @@ render() {
       <div>
         <Row>
 			<Col sm={8} smOffset={2} xs={11} xsOffset={1}>  
-                <h1>TouchBistro React Challenge</h1>
-                <h3>Click each heading to sort</h3>
+                <h1>This is a table</h1>
+                <h3>Click each heading to toggle sort</h3>
+                <Form 
+                    value={this.value}
+                    handleFilter={this.handleFilter}
+                    handleReset={this.handleReset}
+                    />
                 <Table bsStyle="table table-striped">
       
                     <Header 
@@ -74,8 +102,13 @@ render() {
                     <tfoot>
                         <tr>
                             <td colSpan="4" className="subtotal sum sumTitle">Sum</td>
-                            <Sum type="salesRevenue"/> 
-                            <Sum type="quantitySold" /> 
+                            <Sum 
+                                type="salesRevenue"
+                                data={this.state.data}
+                                /> 
+                            <Sum 
+                                type="quantitySold" 
+                                data={this.state.data}/> 
                         </tr>
                     </tfoot>            
                     <tbody>
@@ -87,11 +120,23 @@ render() {
       </div>
 )}}
 
-const Sum = ({ type }) => { 
+const Sum = ({ data, type }) => { 
     let sum = data.reduce((prevVal, item) => prevVal + item[type], 0)
-    debugger; 
     return (<td className="sum">{sum}</td>)
 };
+
+const Form = (props) => {
+    return(
+    <form onSubmit={ (e) => props.handleReset(e) }>
+        <input type="text" 
+            name="filter" 
+            placeholder="filter by name" 
+            value={props.value} 
+            onChange={props.handleFilter} 
+            />
+        <button>Reset</button>    
+    </form>
+)}
 
 const Header = (props) => {
     let headerNames = Object.keys(...data);
@@ -110,13 +155,10 @@ const Header = (props) => {
                 </tr>
                 
             </thead> )   
- 
-            
-    
+
 }
 
 const HeaderItem = (props) => {
-
     return (
         <th onClick={ () => props.sortItem(props.item, props.index)}>
             <a><h4>{props.name}</h4></a>
