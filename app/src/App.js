@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Row, Col, Table, Button, Form } from 'react-bootstrap';
+import { Row, Col, Table, Button, FormControl } from 'react-bootstrap';
 import _ from 'lodash';
 import { data } from './data.js';
 
@@ -127,15 +127,18 @@ const Sum = ({ data, type }) => {
 
 const FilterForm = (props) => {
     return(
-    <Form onSubmit={ (e) => props.handleReset(e) }>
-        <input type="text" 
+    <form onSubmit={ (e) => props.handleReset(e) }>
+
+        <FormControl 
+            bsSize="lg"
+            type="text" 
             name="filter" 
             placeholder="filter by name" 
             value={props.value} 
             onChange={props.handleFilter} 
             />
-        <Button type="submit" bsStyle="success">Reset</Button>    
-    </Form>
+        <Button type="submit" bsStyle="success" className="resetButton">Reset</Button>    
+    </form>
 )}
 
 const Header = (props) => {
