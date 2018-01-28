@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Row, Col, Table, Button } from 'react-bootstrap';
+import { Row, Col, Table, Button, Form } from 'react-bootstrap';
 import _ from 'lodash';
 import { data } from './data.js';
 
@@ -87,7 +87,7 @@ render() {
 			<Col sm={8} smOffset={2} xs={11} xsOffset={1}>  
                 <h1>This is a table</h1>
                 <h3>Click each heading to toggle sort</h3>
-                <Form 
+                <FilterForm 
                     value={this.value}
                     handleFilter={this.handleFilter}
                     handleReset={this.handleReset}
@@ -125,17 +125,17 @@ const Sum = ({ data, type }) => {
     return (<td className="sum">{sum}</td>)
 };
 
-const Form = (props) => {
+const FilterForm = (props) => {
     return(
-    <form onSubmit={ (e) => props.handleReset(e) }>
+    <Form onSubmit={ (e) => props.handleReset(e) }>
         <input type="text" 
             name="filter" 
             placeholder="filter by name" 
             value={props.value} 
             onChange={props.handleFilter} 
             />
-        <button>Reset</button>    
-    </form>
+        <Button type="submit" bsStyle="success">Reset</Button>    
+    </Form>
 )}
 
 const Header = (props) => {
