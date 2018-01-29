@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
-import { Row, Col, Table, Button, FormControl } from 'react-bootstrap';
+import { Row, Col, Table } from 'react-bootstrap';
 import _ from 'lodash';
 import { data } from './data.js';
+import { FilterForm } from './FilterForm.js';
 
 
 
@@ -13,11 +14,13 @@ class App extends Component {
         this.state = {     
             data: data,
             isSorted: [false, false, false, false, false, false],
-            value: ""}
+            inputFilterValue: "",
+            selectFilterType: "name"
+        }
 
         this.sortItem = this.sortItem.bind(this);
         this.handleFilter = this.handleFilter.bind(this);
-        this.handleReset = this.handleReset.bind(this);
+        this.handleFilterType = this.handleFilterType.bind(this);
     }
 
 //make sort toggle-able (i.e. A-Z then Z-A) using an attribute on HeaderItem; manage it by state (ie. sorted = true) 
@@ -44,28 +47,28 @@ sortItem = (value, index) => {
 
 }
 
-handleFilter(event) {
-    event.preventDefault();
-    let filter = event.target.value.toLowerCase();
+handleFilter = (event, type) => {    
+    let filterParam = event.target.value.toLowerCase();
     let dataCopy = Object.assign({}, data);
+
+//use _.include to check if filterParam exist in name
     let filteredDataCopy = _.filter(dataCopy, function(o) {
-        if (o.name[0].toLowerCase() === filter){
-            return o;
-        } 
+        if (_.includes(o[type].toLowerCase(), filterParam )){
+            return o; 
+        }
     })
     this.setState({
-        value: filter,
+        value: filterParam,
         data: filteredDataCopy
     }); 
   }
 
-  handleReset(e){
-    e.preventDefault();
+  handleFilterType = (event) => {
+
     this.setState({
-        data: data
+        selectFilterType: event.target.value
     })
   }
-
 
 render() {
 
@@ -91,6 +94,9 @@ render() {
                     value={this.value}
                     handleFilter={this.handleFilter}
                     handleReset={this.handleReset}
+                    handleFilterType={this.handleFilterType}
+                    selectFilterType={this.state.selectFilterType}
+
                     />
                 <Table bsStyle="table table-striped">
       
@@ -125,21 +131,6 @@ const Sum = ({ data, type }) => {
     return (<td className="sum">{sum}</td>)
 };
 
-const FilterForm = (props) => {
-    return(
-    <form onSubmit={ (e) => props.handleReset(e) }>
-
-        <FormControl 
-            bsSize="lg"
-            type="text" 
-            name="filter" 
-            placeholder="filter by name" 
-            value={props.value} 
-            onChange={props.handleFilter} 
-            />
-        <Button type="submit" bsStyle="success" className="resetButton">Reset</Button>    
-    </form>
-)}
 
 const Header = (props) => {
     let headerNames = Object.keys(...data);
